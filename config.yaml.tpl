@@ -13,12 +13,6 @@ write_files:
     GA_PATH="/dev/vport1p1"
   owner: root
   permissions: '0644'
-- path: /etc/hosts
-  content: |-
-    127.0.0.1 localhost
-    127.0.0.1 ${server_host}
-  owner: root
-  permissions: '0644'
 
 hostname: k8s-${server_name}
 

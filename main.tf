@@ -78,7 +78,7 @@ resource "null_resource" "ipxe_k3os_config" {
 
 module "pxe-vm" {
   source  = "app.terraform.io/McSwainHomeNetwork/pxe-vm/proxmox"
-  version = "0.0.7"
+  version = "0.0.9"
 
   name = "k3s-server-${var.server_friendly_name}"
 
@@ -94,6 +94,8 @@ module "pxe-vm" {
   ipxe_server_password = var.ipxe_password
   ipxe_cmdline_args    = "k3os.mode=install k3os.install.device=/dev/vda k3os.install.silent=true k3os.install.config_url=http://${var.ipxe_host}/${var.server_friendly_name}.yaml k3os.install.iso_url=$${media_root}/k3os-amd64.iso mcswain.id=${null_resource.ipxe_k3os_config.id}"
   ipxe_menu_path       = "/mnt/storage/netboot.xyz/config/menus"
+
+  mac_address = "00005e862519"
 
   cpu_cores = 8
   memory    = 16384
