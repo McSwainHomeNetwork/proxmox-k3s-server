@@ -23,7 +23,6 @@ k3os:
   - ${dns_server}
   password: "${node_password}"
   token: "${token}"
-  server_url: ${server_url}
 
   k3s_args:
   - server
@@ -34,7 +33,7 @@ k3os:
   - "--etcd-snapshot-retention"
   - "7"
   - "--etcd-snapshot-schedule-cron"
-  - "'*/60 * * * *'"
+  - "\*/60 \* \* \* \*"
   - "--etcd-s3-endpoint"
   - "${s3_endpoint}"
   - "--etcd-s3-skip-ssl-verify"
