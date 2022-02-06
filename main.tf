@@ -42,11 +42,6 @@ locals {
   k3os_config = templatefile("${path.module}/config.yaml.tpl", {
     server_name               = var.server_friendly_name,
     dns_servers               = var.dns_servers,
-    s3_endpoint               = var.etcd_s3_backup_endpoint,
-    s3_access_key             = var.etcd_s3_backup_access_key,
-    s3_secret_key             = var.etcd_s3_backup_secret_key,
-    s3_folder                 = "k8s-${var.server_friendly_name}",
-    s3_bucket                 = var.etcd_s3_backup_bucket,
     node_password             = random_string.node_password.result,
     token                     = random_string.token.result,
     aescbc_encryption_key_b64 = length(var.encryption_key_base64) > 0 ? var.encryption_key_base64 : random_id.encryption_key[0].b64_std,

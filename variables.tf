@@ -41,27 +41,6 @@ variable "dns_servers" {
   sensitive = true
 }
 
-variable "etcd_s3_backup_endpoint" {
-  type      = string
-  sensitive = true
-}
-
-variable "etcd_s3_backup_access_key" {
-  type      = string
-  sensitive = true
-}
-
-variable "etcd_s3_backup_secret_key" {
-  type      = string
-  sensitive = true
-}
-
-variable "etcd_s3_backup_bucket" {
-  type      = string
-  default   = "etcd-backups"
-  sensitive = true
-}
-
 variable "additional_ssh_keys" {
   type    = list(string)
   default = []
