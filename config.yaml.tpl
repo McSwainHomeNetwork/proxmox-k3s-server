@@ -33,7 +33,7 @@ k3os:
   - "--etcd-snapshot-retention"
   - "7"
   - "--etcd-snapshot-schedule-cron"
-  - "\*/60 \* \* \* \*"
+  - "*/60 * * * *"
   - "--etcd-s3-endpoint"
   - "${s3_endpoint}"
   - "--etcd-s3-skip-ssl-verify"
