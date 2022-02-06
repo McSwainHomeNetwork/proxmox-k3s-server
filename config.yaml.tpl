@@ -50,8 +50,6 @@ k3os:
   - "--kube-apiserver-arg"
   - "allow-privileged"
   - "--kube-apiserver-arg"
-  - "anonymous-auth false"
-  - "--kube-apiserver-arg"
   - "enable-admission-plugins CertificateSubjectRestrictions,DefaultIngressClass,DefaultStorageClass,LimitRanger,MutatingAdmissionWebhook,NamespaceExists,NamespaceLifecycle,PersistentVolumeClaimResize,PodSecurityPolicy,ResourceQuota,ServiceAccount,StorageObjectInUseProtection"
   - "--kube-apiserver-arg"
   - "feature-gates AllBeta=true"
