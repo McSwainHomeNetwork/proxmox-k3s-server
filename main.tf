@@ -26,6 +26,10 @@ terraform {
       source  = "hashicorp/random"
       version = "3.1.0"
     }
+    tls = {
+      source  = "hashicorp/tls"
+      version = "3.1.0"
+    }
   }
 }
 
@@ -37,7 +41,7 @@ resource "local_file" "k3os_config" {
 locals {
   k3os_config = templatefile("${path.module}/config.yaml.tpl", {
     server_name   = var.server_friendly_name,
-    dns_server    = var.dns_server,
+    dns_servers   = var.dns_servers,
     s3_endpoint   = var.etcd_s3_backup_endpoint,
     s3_access_key = var.etcd_s3_backup_access_key,
     s3_secret_key = var.etcd_s3_backup_secret_key,
@@ -45,8 +49,7 @@ locals {
     s3_bucket     = var.etcd_s3_backup_bucket,
     node_password = random_string.node_password.result,
     token         = random_string.token.result,
-    server_url    = var.k8s_server_url,
-    server_host   = var.k8s_server_host,
+    ssh_keys      = concat([tls_private_key.provision_key.public_key_openssh], var.additional_ssh_keys)
   })
 }
 
@@ -58,6 +61,11 @@ resource "random_string" "node_password" {
 resource "random_string" "token" {
   length  = 32
   special = false
+}
+
+resource "tls_private_key" "provision_key" {
+  algorithm = "RSA"
+  rsa_bits  = "4096"
 }
 
 resource "null_resource" "ipxe_k3os_config" {
@@ -78,7 +86,7 @@ resource "null_resource" "ipxe_k3os_config" {
 
 module "pxe-vm" {
   source  = "app.terraform.io/McSwainHomeNetwork/pxe-vm/proxmox"
-  version = "0.0.9"
+  version = "0.0.10"
 
   name = "k3s-server-${var.server_friendly_name}"
 
@@ -101,8 +109,33 @@ module "pxe-vm" {
   memory    = 16384
 
   disks = [{
-    size    = "16GB"
+    size    = "16G"
     storage = "local-lvm"
     type    = "virtio"
   }]
+}
+
+resource "null_resource" "k3os_provision" {
+  triggers = {
+    force_recreate_on_change_of = local.k3os_config
+  }
+
+  # Remove provision key after provisioning
+  provisioner "remote-exec" {
+    inline = [
+      "sudo mount -o rw,remount /k3os/system",
+      "sudo grep -v '${tls_private_key.provision_key.public_key_openssh}' /k3os/system/config.yaml > tmpfile && sudo mv tmpfile /k3os/system/config.yaml",
+      "sudo chmod 0600 /k3os/system/config.yaml",
+      "grep -v '${tls_private_key.provision_key.public_key_openssh}' ~/.ssh/authorized_keys > tmpfile && mv tmpfile ~/.ssh/authorized_keys",
+      "sudo chmod 0600 ~/.ssh/authorized_keys",
+      "sudo /sbin/reboot -d 10"
+    ]
+    connection {
+      type        = "ssh"
+      user        = "rancher"
+      host        = module.pxe-vm.ssh_host
+      private_key = tls_private_key.provision_key.private_key_pem
+      script_path = "/home/rancher/terraform_provisioners_%RAND%.sh"
+    }
+  }
 }

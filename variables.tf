@@ -36,8 +36,8 @@ variable "ipxe_password" {
   type = string
 }
 
-variable "dns_server" {
-  type      = string
+variable "dns_servers" {
+  type      = list(string)
   sensitive = true
 }
 
@@ -62,12 +62,7 @@ variable "etcd_s3_backup_bucket" {
   sensitive = true
 }
 
-variable "k8s_server_url" {
-  type      = string
-  sensitive = true
-}
-
-variable "k8s_server_host" {
-  type      = string
-  sensitive = true
+variable "additional_ssh_keys" {
+  type    = list(string)
+  default = []
 }

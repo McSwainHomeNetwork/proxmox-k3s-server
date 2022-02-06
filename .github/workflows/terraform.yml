@@ -36,10 +36,8 @@ jobs:
         TF_VAR_ipxe_host: ${{ secrets.TF_VAR_IPXE_HOST }}
         TF_VAR_ipxe_password: ${{ secrets.TF_VAR_IPXE_PASSWORD }}
         TF_VAR_ipxe_username: ${{ secrets.TF_VAR_IPXE_USERNAME }}
-        TF_VAR_k8s_server_url: ${{ secrets.TF_VAR_K8S_SERVER_URL }}
-        TF_VAR_k8s_server_host: ${{ secrets.TF_VAR_K8S_SERVER_HOST }}
         TF_VAR_proxmox_url: ${{ secrets.TF_VAR_PROXMOX_URL }}
-        TF_VAR_dns_server : ${{ secrets.TF_VAR_DNS_SERVER }}
+        TF_VAR_dns_servers: ${{ secrets.TF_VAR_DNS_SERVERS }}
         TF_VAR_etcd_s3_backup_access_key: ${{ secrets.TF_VAR_ETCD_S3_BACKUP_ACCESS_KEY }}
         TF_VAR_etcd_s3_backup_secret_key: ${{ secrets.TF_VAR_ETCD_S3_BACKUP_SECRET_KEY }}
         TF_VAR_etcd_s3_backup_endpoint: ${{ secrets.TF_VAR_ETCD_S3_BACKUP_ENDPOINT }}
@@ -47,6 +45,7 @@ jobs:
         PM_USER: ${{ secrets.PM_USER }}
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        TF_VAR_additional_ssh_keys: ${{ secrets.TF_VAR_ADDITIONAL_SSH_KEYS }} 
 
     - name: Terraform Validate
       id: validate
@@ -61,10 +60,8 @@ jobs:
         TF_VAR_ipxe_host: ${{ secrets.TF_VAR_IPXE_HOST }}
         TF_VAR_ipxe_password: ${{ secrets.TF_VAR_IPXE_PASSWORD }}
         TF_VAR_ipxe_username: ${{ secrets.TF_VAR_IPXE_USERNAME }}
-        TF_VAR_k8s_server_url: ${{ secrets.TF_VAR_K8S_SERVER_URL }}
-        TF_VAR_k8s_server_host: ${{ secrets.TF_VAR_K8S_SERVER_HOST }}
         TF_VAR_proxmox_url: ${{ secrets.TF_VAR_PROXMOX_URL }}
-        TF_VAR_dns_server : ${{ secrets.TF_VAR_DNS_SERVER }}
+        TF_VAR_dns_servers: ${{ secrets.TF_VAR_DNS_SERVERS }}
         TF_VAR_etcd_s3_backup_access_key: ${{ secrets.TF_VAR_ETCD_S3_BACKUP_ACCESS_KEY }}
         TF_VAR_etcd_s3_backup_secret_key: ${{ secrets.TF_VAR_ETCD_S3_BACKUP_SECRET_KEY }}
         TF_VAR_etcd_s3_backup_endpoint: ${{ secrets.TF_VAR_ETCD_S3_BACKUP_ENDPOINT }}
@@ -72,6 +69,7 @@ jobs:
         PM_USER: ${{ secrets.PM_USER }}
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        TF_VAR_additional_ssh_keys: ${{ secrets.TF_VAR_ADDITIONAL_SSH_KEYS }} 
 
     - name: Update Pull Request
       uses: actions/github-script@0.9.0
@@ -114,10 +112,8 @@ jobs:
         TF_VAR_ipxe_host: ${{ secrets.TF_VAR_IPXE_HOST }}
         TF_VAR_ipxe_password: ${{ secrets.TF_VAR_IPXE_PASSWORD }}
         TF_VAR_ipxe_username: ${{ secrets.TF_VAR_IPXE_USERNAME }}
-        TF_VAR_k8s_server_url: ${{ secrets.TF_VAR_K8S_SERVER_URL }}
         TF_VAR_proxmox_url: ${{ secrets.TF_VAR_PROXMOX_URL }}
-        TF_VAR_k8s_server_host: ${{ secrets.TF_VAR_K8S_SERVER_HOST }}
-        TF_VAR_dns_server : ${{ secrets.TF_VAR_DNS_SERVER }}
+        TF_VAR_dns_servers: ${{ secrets.TF_VAR_DNS_SERVERS }}
         TF_VAR_etcd_s3_backup_access_key: ${{ secrets.TF_VAR_ETCD_S3_BACKUP_ACCESS_KEY }}
         TF_VAR_etcd_s3_backup_secret_key: ${{ secrets.TF_VAR_ETCD_S3_BACKUP_SECRET_KEY }}
         TF_VAR_etcd_s3_backup_endpoint: ${{ secrets.TF_VAR_ETCD_S3_BACKUP_ENDPOINT }}
@@ -125,3 +121,4 @@ jobs:
         PM_USER: ${{ secrets.PM_USER }}
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        TF_VAR_additional_ssh_keys: ${{ secrets.TF_VAR_ADDITIONAL_SSH_KEYS }} 
