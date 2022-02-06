@@ -66,3 +66,9 @@ variable "additional_ssh_keys" {
   type    = list(string)
   default = []
 }
+
+variable "encryption_key_base64" {
+  type      = string
+  default   = ""
+  sensitive = true
+}

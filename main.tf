@@ -40,16 +40,17 @@ resource "local_file" "k3os_config" {
 
 locals {
   k3os_config = templatefile("${path.module}/config.yaml.tpl", {
-    server_name   = var.server_friendly_name,
-    dns_servers   = var.dns_servers,
-    s3_endpoint   = var.etcd_s3_backup_endpoint,
-    s3_access_key = var.etcd_s3_backup_access_key,
-    s3_secret_key = var.etcd_s3_backup_secret_key,
-    s3_folder     = "k8s-${var.server_friendly_name}",
-    s3_bucket     = var.etcd_s3_backup_bucket,
-    node_password = random_string.node_password.result,
-    token         = random_string.token.result,
-    ssh_keys      = concat([tls_private_key.provision_key.public_key_openssh], var.additional_ssh_keys)
+    server_name               = var.server_friendly_name,
+    dns_servers               = var.dns_servers,
+    s3_endpoint               = var.etcd_s3_backup_endpoint,
+    s3_access_key             = var.etcd_s3_backup_access_key,
+    s3_secret_key             = var.etcd_s3_backup_secret_key,
+    s3_folder                 = "k8s-${var.server_friendly_name}",
+    s3_bucket                 = var.etcd_s3_backup_bucket,
+    node_password             = random_string.node_password.result,
+    token                     = random_string.token.result,
+    aescbc_encryption_key_b64 = length(var.encryption_key_base64) > 0 ? var.encryption_key_base64 : random_id.encryption_key[0].b64_std,
+    ssh_keys                  = concat([tls_private_key.provision_key.public_key_openssh], var.additional_ssh_keys)
   })
 }
 
@@ -115,6 +116,11 @@ module "pxe-vm" {
   }]
 }
 
+resource "random_id" "encryption_key" {
+  byte_length = 32
+  count       = length(var.encryption_key_base64) > 0 ? 0 : 1
+}
+
 resource "null_resource" "k3os_provision" {
   triggers = {
     force_recreate_on_change_of = local.k3os_config
@@ -126,8 +132,6 @@ resource "null_resource" "k3os_provision" {
       "sudo mount -o rw,remount /k3os/system",
       "sudo grep -v '${tls_private_key.provision_key.public_key_openssh}' /k3os/system/config.yaml > tmpfile && sudo mv tmpfile /k3os/system/config.yaml",
       "sudo chmod 0600 /k3os/system/config.yaml",
-      "grep -v '${tls_private_key.provision_key.public_key_openssh}' ~/.ssh/authorized_keys > tmpfile && mv tmpfile ~/.ssh/authorized_keys",
-      "sudo chmod 0600 ~/.ssh/authorized_keys",
       "sudo /sbin/reboot -d 10"
     ]
     connection {
