@@ -1,3 +1,6 @@
 .terraform/
 /*.yaml
 /*.yml
+kubeconfig
+node_token
+*.pem

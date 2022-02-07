@@ -124,10 +124,8 @@ resource "null_resource" "k3os_provision" {
   # Remove provision key after provisioning
   provisioner "remote-exec" {
     inline = [
-      "sudo mount -o rw,remount /k3os/system",
-      "sudo grep -v '${tls_private_key.provision_key.public_key_openssh}' /k3os/system/config.yaml > tmpfile && sudo mv tmpfile /k3os/system/config.yaml",
-      "sudo chmod 0600 /k3os/system/config.yaml",
-      "sudo /sbin/reboot -d 10"
+      "bash -c 'until [ -f /etc/rancher/k3s/k3s.yaml ] ; do echo waiting on kubeconfig ; sleep 1 ; done'",
+      "bash -c 'until [ -f /var/lib/rancher/k3s/server/node-token ] ; do echo waiting on node-token ; sleep 1 ; done'"
     ]
     connection {
       type        = "ssh"
@@ -137,4 +135,80 @@ resource "null_resource" "k3os_provision" {
       script_path = "/home/rancher/terraform_provisioners_%RAND%.sh"
     }
   }
+}
+
+resource "local_file" "provision_key" {
+  content  = tls_private_key.provision_key.private_key_pem
+  filename = "${path.module}/provision_key.pem"
+}
+
+resource "null_resource" "provision_key_perms" {
+  triggers = {
+    force_recreate_on_change_of = local.k3os_config
+  }
+
+  provisioner "local-exec" {
+    command = "chmod 600 ${local_file.provision_key.filename}"
+  }
+
+  depends_on = [null_resource.k3os_provision]
+}
+
+resource "null_resource" "node_token" {
+  triggers = {
+    force_recreate_on_change_of = local.k3os_config
+  }
+
+  provisioner "local-exec" {
+    command = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${local_file.provision_key.filename} rancher@${module.pxe-vm.ssh_host} sudo cat /var/lib/rancher/k3s/server/node-token > ${path.module}/node_token"
+  }
+
+  depends_on = [null_resource.provision_key_perms]
+}
+
+data "local_file" "kubeconfig" {
+  filename   = "${path.module}/kubeconfig"
+  depends_on = [null_resource.kubeconfig]
+}
+
+resource "null_resource" "kubeconfig" {
+  triggers = {
+    force_recreate_on_change_of = local.k3os_config
+  }
+
+  provisioner "local-exec" {
+    command = "scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${local_file.provision_key.filename} rancher@${module.pxe-vm.ssh_host}:/etc/rancher/k3s/k3s.yaml ${path.module}/kubeconfig"
+  }
+
+  depends_on = [null_resource.provision_key_perms]
+}
+
+data "local_file" "node_token" {
+  filename   = "${path.module}/node_token"
+  depends_on = [null_resource.node_token]
+}
+
+resource "null_resource" "k3os_remove_provision_key" {
+  triggers = {
+    force_recreate_on_change_of = local.k3os_config
+  }
+
+  # Remove provision key after provisioning
+  provisioner "remote-exec" {
+    inline = [
+      "sudo mount -o rw,remount /k3os/system",
+      "sudo grep -v '${tls_private_key.provision_key.public_key_openssh}' /k3os/system/config.yaml > tmpfile && sudo mv tmpfile /k3os/system/config.yaml",
+      "sudo chmod 0600 /k3os/system/config.yaml",
+      "sudo /sbin/reboot"
+    ]
+    connection {
+      type        = "ssh"
+      user        = "rancher"
+      host        = module.pxe-vm.ssh_host
+      private_key = tls_private_key.provision_key.private_key_pem
+      script_path = "/home/rancher/terraform_provisioners_%RAND%.sh"
+    }
+  }
+
+  depends_on = [null_resource.node_token, null_resource.kubeconfig]
 }
