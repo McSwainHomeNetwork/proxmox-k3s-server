@@ -284,6 +284,8 @@ k3os:
   - "--kube-apiserver-arg"
   - "requestheader-username-headers=X-Remote-User"
   - "--kube-apiserver-arg"
+  - "encryption-provider-config=/etc/k3s-encryption-provider.yaml"
+  - "--kube-apiserver-arg"
   - "service-account-lookup"
   - "--kube-apiserver-arg"
   - "anonymous-auth=false"
