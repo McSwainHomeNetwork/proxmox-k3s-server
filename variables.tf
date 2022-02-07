@@ -51,3 +51,8 @@ variable "encryption_key_base64" {
   default   = ""
   sensitive = true
 }
+
+variable "k8s_server_hostname" {
+  type      = string
+  sensitive = true
+}

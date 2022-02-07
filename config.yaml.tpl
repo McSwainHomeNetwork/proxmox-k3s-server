@@ -339,3 +339,5 @@ k3os:
   - "service-account-private-key-file=/var/lib/rancher/k3s/server/tls/service.key"
   - "--kube-controller-manager-arg"
   - "use-service-account-credentials=true"
+  - "--tls-san"
+  - "${k8s_hostname}"

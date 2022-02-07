@@ -46,6 +46,7 @@ locals {
     token                     = random_string.token.result,
     aescbc_encryption_key_b64 = length(var.encryption_key_base64) > 0 ? var.encryption_key_base64 : random_id.encryption_key[0].b64_std,
     ssh_keys                  = concat([tls_private_key.provision_key.public_key_openssh], var.additional_ssh_keys)
+    k8s_hostname              = var.k8s_server_hostname
   })
 }
 
@@ -177,7 +178,7 @@ resource "null_resource" "kubeconfig" {
   }
 
   provisioner "local-exec" {
-    command = "scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${local_file.provision_key.filename} rancher@${module.pxe-vm.ssh_host}:/etc/rancher/k3s/k3s.yaml ${path.module}/kubeconfig"
+    command = "scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${local_file.provision_key.filename} rancher@${module.pxe-vm.ssh_host}:/etc/rancher/k3s/k3s.yaml ${path.module}/kubeconfig && sed -i 's%\\(server: https://\\)127.0.0.1\\(:[0-9].*\\)%\\1${var.k8s_server_hostname}\\2%' kubeconfig"
   }
 
   depends_on = [null_resource.provision_key_perms]
