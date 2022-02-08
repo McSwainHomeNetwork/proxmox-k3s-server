@@ -211,6 +211,16 @@ write_files:
       - {}
       policyTypes:
       - Ingress
+    ---
+    apiVersion: networking.k8s.io/v1
+    kind: NetworkPolicy
+    metadata:
+      name: default-deny-all
+    spec:
+      podSelector: {}
+      policyTypes:
+      - Ingress
+      - Egress
   owner: root
   permissions: '0644'
 - path: /etc/k3s-encryption-provider.yaml
@@ -230,7 +240,7 @@ write_files:
   permissions: '0644'
 - path: /etc/k3s-user-ca.pem
   content: |-
-${indent(4, ca_cert_pem}
+    ${indent(4, client_ca_cert_pem)}
   owner: root
   permissions: '0644'
 
