@@ -228,6 +228,11 @@ write_files:
         - identity: {}
   owner: root
   permissions: '0644'
+- path: /etc/k3s-user-ca.pem
+  content: |-
+${indent(4, ca_cert_pem}
+  owner: root
+  permissions: '0644'
 
 hostname: k8s-${server_name}
 
@@ -275,6 +280,8 @@ k3os:
   - "service-account-signing-key-file=/var/lib/rancher/k3s/server/tls/service.key"
   - "--kube-apiserver-arg"
   - "authorization-mode=Node,RBAC"
+  - "--kube-apiserver-arg"
+  - "client-ca-file=/etc/k3s-user-ca.pem"
   - "--kube-apiserver-arg"
   - "requestheader-allowed-names=system:auth-proxy"
   - "--kube-apiserver-arg"

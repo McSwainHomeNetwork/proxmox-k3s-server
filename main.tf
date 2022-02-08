@@ -38,6 +38,17 @@ resource "local_file" "k3os_config" {
   filename = "${path.module}/config-${var.server_friendly_name}.yaml"
 }
 
+data "terraform_remote_state" "k8s_user_pki" {
+  backend = "remote"
+
+  config = {
+    organization = "McSwainHomeNetwork"
+    workspaces = {
+      name = "k8s-user-pki"
+    }
+  }
+}
+
 locals {
   k3os_config = templatefile("${path.module}/config.yaml.tpl", {
     server_name               = var.server_friendly_name,
@@ -47,6 +58,7 @@ locals {
     aescbc_encryption_key_b64 = length(var.encryption_key_base64) > 0 ? var.encryption_key_base64 : random_id.encryption_key[0].b64_std,
     ssh_keys                  = concat([tls_private_key.provision_key.public_key_openssh], var.additional_ssh_keys)
     k8s_hostname              = var.k8s_server_hostname
+    client_ca_cert_pem        = data.terraform_remote_state.k8s_user_pki.outputs.ca_cert_pem
     datastore_endpoint        = var.datastore_endpoint
   })
 }
