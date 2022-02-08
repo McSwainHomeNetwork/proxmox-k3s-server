@@ -249,6 +249,8 @@ k3os:
   - "--with-node-id"
   - "--selinux"
   - "--protect-kernel-defaults"
+  - "--datastore-endpoint"
+  - "${datastore_endpoint}"
   - "--kube-apiserver-arg"
   - "audit-log-path=/var/log/k3s-audit"
   - "--kube-apiserver-arg"

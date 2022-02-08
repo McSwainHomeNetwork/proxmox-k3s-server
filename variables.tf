@@ -56,3 +56,8 @@ variable "k8s_server_hostname" {
   type      = string
   sensitive = true
 }
+
+variable "datastore_endpoint" {
+  type      = string
+  sensitive = true
+}

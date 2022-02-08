@@ -47,6 +47,7 @@ locals {
     aescbc_encryption_key_b64 = length(var.encryption_key_base64) > 0 ? var.encryption_key_base64 : random_id.encryption_key[0].b64_std,
     ssh_keys                  = concat([tls_private_key.provision_key.public_key_openssh], var.additional_ssh_keys)
     k8s_hostname              = var.k8s_server_hostname
+    datastore_endpoint        = var.datastore_endpoint
   })
 }
 
