@@ -138,7 +138,6 @@ resource "null_resource" "k3os_provision" {
   # Remove provision key after provisioning
   provisioner "remote-exec" {
     inline = [
-      "bash -c 'until [ -f /etc/rancher/k3s/k3s.yaml ] ; do echo waiting on kubeconfig ; sleep 1 ; done'",
       "bash -c 'until [ -f /var/lib/rancher/k3s/server/node-token ] ; do echo waiting on node-token ; sleep 1 ; done'"
     ]
     connection {
@@ -180,23 +179,6 @@ resource "null_resource" "node_token" {
   depends_on = [null_resource.provision_key_perms]
 }
 
-data "local_file" "kubeconfig" {
-  filename   = "${path.module}/kubeconfig"
-  depends_on = [null_resource.kubeconfig]
-}
-
-resource "null_resource" "kubeconfig" {
-  triggers = {
-    force_recreate_on_change_of = local.k3os_config
-  }
-
-  provisioner "local-exec" {
-    command = "scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${local_file.provision_key.filename} rancher@${module.pxe-vm.ssh_host}:/etc/rancher/k3s/k3s.yaml ${path.module}/kubeconfig && sed -i 's%\\(server: https://\\)127.0.0.1\\(:[0-9].*\\)%\\1${var.k8s_server_hostname}\\2%' kubeconfig"
-  }
-
-  depends_on = [null_resource.provision_key_perms]
-}
-
 data "local_file" "node_token" {
   filename   = "${path.module}/node_token"
   depends_on = [null_resource.node_token]
@@ -224,5 +206,5 @@ resource "null_resource" "k3os_remove_provision_key" {
     }
   }
 
-  depends_on = [null_resource.node_token, null_resource.kubeconfig]
+  depends_on = [null_resource.node_token]
 }
