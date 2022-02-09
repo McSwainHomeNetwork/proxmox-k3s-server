@@ -59,6 +59,7 @@ locals {
     ssh_keys                  = concat([tls_private_key.provision_key.public_key_openssh], var.additional_ssh_keys)
     k8s_hostname              = var.k8s_server_hostname
     client_ca_cert_pem        = data.terraform_remote_state.k8s_user_pki.outputs.ca_cert_pem
+    client_ca_private_key_pem = data.terraform_remote_state.k8s_user_pki.outputs.ca_private_key_pem
     datastore_endpoint        = var.datastore_endpoint
   })
 }
