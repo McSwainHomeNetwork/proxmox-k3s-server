@@ -54,7 +54,7 @@ locals {
     server_name               = var.server_friendly_name,
     dns_servers               = var.dns_servers,
     node_password             = random_string.node_password.result,
-    token                     = random_string.token.result,
+    token                     = length(var.cluster_token) > 0 ? var.cluster_token : random_string.token.0.result,
     aescbc_encryption_key_b64 = length(var.encryption_key_base64) > 0 ? var.encryption_key_base64 : random_id.encryption_key[0].b64_std,
     ssh_keys                  = concat([tls_private_key.provision_key.public_key_openssh], var.additional_ssh_keys)
     k8s_hostname              = var.k8s_server_hostname
@@ -70,6 +70,7 @@ resource "random_string" "node_password" {
 }
 
 resource "random_string" "token" {
+  count   = length(var.cluster_token) > 0 ? 0 : 1
   length  = 32
   special = false
 }

@@ -61,3 +61,9 @@ variable "datastore_endpoint" {
   type      = string
   sensitive = true
 }
+
+variable "cluster_token" {
+  type      = string
+  default   = ""
+  sensitive = true
+}
