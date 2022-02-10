@@ -113,7 +113,7 @@ k3os:
   - "--kube-apiserver-arg"
   - "anonymous-auth=false"
   - "--kube-apiserver-arg"
-  - "enable-admission-plugins=DefaultIngressClass,DefaultStorageClass,LimitRanger,MutatingAdmissionWebhook,NamespaceExists,NamespaceLifecycle,NodeRestriction,PersistentVolumeClaimResize,PodSecurityPolicy,ResourceQuota,ServiceAccount,StorageObjectInUseProtection"
+  - "enable-admission-plugins=DefaultIngressClass,DefaultStorageClass,LimitRanger,MutatingAdmissionWebhook,NamespaceExists,NamespaceLifecycle,NodeRestriction,PersistentVolumeClaimResize,ResourceQuota,ServiceAccount,StorageObjectInUseProtection"
   - "--kube-apiserver-arg"
   - "feature-gates=AllBeta=true"
   - "--kube-scheduler-arg"
